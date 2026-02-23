@@ -131,7 +131,7 @@ export default function HomePage() {
       {/* CONTACT FORM */}
       <section className="py-24">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-white/10 backdrop-blur rounded-3xl shadow-2xl p-10 border border-white/10">
+          <div className="bg-white/10 backdrop-blur rounded-3xl shadow-2xl p-5 md:p-10 border border-white/10">
             <h2 className="text-3xl font-bold text-center mb-4">
               Contact Us
             </h2>

@@ -19,8 +19,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black px-6 py-16">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen px-6 py-16">
+      <div className="mx-auto">
 
         {/* HEADER */}
         <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 mb-8">
