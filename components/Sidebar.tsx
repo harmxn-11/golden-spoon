@@ -9,7 +9,7 @@ export default function Sidebar() {
   const [open, setOpen] = useState(false)
 
   const links = [
-    { name: "Dashboard", href: "/u/dashboard", icon: LayoutDashboard },
+    { name: "Dashboard", href: "/u", icon: LayoutDashboard },
     { name: "Menu", href: "/u/menu", icon: MenuIcon },
     { name: "Withdrawal Requests", href: "/u/payments", icon: Banknote },
     { name: "Users", href: "/u/users", icon: Users },
