@@ -20,6 +20,7 @@ interface CartItem extends MenuItem {
 
 export default function CustomerMenuPage() {
   const [orderType, setOrderType] = useState<"dine-in" | "takeaway">("dine-in")
+  const [paymentMode, setPaymentMode] = useState<"cash" | "upi">("upi")
 
   const menu: MenuSection[] = [
     {
@@ -69,14 +70,14 @@ export default function CustomerMenuPage() {
     0
   )
 
-  const payNow = () => {
+  const placeOrder = () => {
     if (!cart.length) {
       alert("Please add items to cart")
       return
     }
 
     alert(
-      `Proceeding to UPI Payment\nOrder Type: ${orderType}\nTotal: ₹${totalAmount}`
+      `Order Confirmed\nOrder Type: ${orderType}\nPayment: ${paymentMode.toUpperCase()}\nTotal: ₹${totalAmount}`
     )
   }
 
@@ -190,16 +191,59 @@ export default function CustomerMenuPage() {
             </div>
           </div>
 
-          {/* PAYMENT */}
+          {/* PAYMENT OPTIONS */}
+          <div className="mb-6">
+            <h3 className="font-semibold mb-3">Payment Method</h3>
+
+            <div className="flex gap-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  checked={paymentMode === "cash"}
+                  onChange={() => setPaymentMode("cash")}
+                  className="accent-orange-500"
+                />
+                Cash
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  checked={paymentMode === "upi"}
+                  onChange={() => setPaymentMode("upi")}
+                  className="accent-orange-500"
+                />
+                UPI
+              </label>
+            </div>
+          </div>
+
+          {/* UPI QR */}
+          {paymentMode === "upi" && (
+            <div className="text-center mb-6">
+              <p className="text-gray-300 mb-2">Scan QR to Pay</p>
+              <img
+                src="/upi-qr.png"
+                alt="UPI QR"
+                className="mx-auto w-36 h-36 rounded-xl border border-white/20"
+              />
+            </div>
+          )}
+
+          {/* PLACE ORDER BUTTON */}
           <button
-            onClick={payNow}
-            className="w-full bg-emerald-600 py-3 rounded-xl font-semibold hover:bg-emerald-700 transition"
+            onClick={placeOrder}
+            className={`w-full py-3 rounded-xl font-semibold transition ${
+              paymentMode === "upi"
+                ? "bg-emerald-600 hover:bg-emerald-700"
+                : "bg-orange-500 hover:bg-orange-600"
+            }`}
           >
-            Pay via UPI
+            {paymentMode === "upi" ? "Pay via UPI" : "Place Cash Order"}
           </button>
 
           <p className="text-xs text-gray-400 text-center mt-3">
-            Secure UPI payment • No extra charges
+            Secure payment • No extra charges
           </p>
         </div>
       </div>
