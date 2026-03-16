@@ -1,74 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-
-import { loginUser } from "@/lib/firebase/firebaseAuth"
-import { getUserProfile } from "@/lib/firebase/firebaseUserService"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { signInUser } from "@/firebase/Users";
 
 export default function LoginPage() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      // 1️⃣ Firebase Login
-      const user = await loginUser(email, password)
-
-      // 2️⃣ Fetch user role from Firestore
-      const profile = await getUserProfile(user.uid)
-
-      if (!profile) {
-        throw new Error("User profile not found")
-      }
-
-      // 3️⃣ Role-based redirect
-      if (profile.role === "admin") {
-        router.push("/admin")
-      } else if (profile.role === "chef") {
-        router.push("/chef")
-      } else {
-        router.push("/menu")
-      }
-
+      await signInUser(email,password);
     } catch (err: any) {
-      setError(err.message || "Login failed")
+      setError(err.message || "Login failed");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center px-6">
-
       {/* CARD */}
       <div className="w-full max-w-md bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8">
-
         {/* HEADER */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-500 flex items-center justify-center text-white text-2xl">
             🍽
           </div>
-          <h1 className="text-3xl font-extrabold text-gray-800">
-            Login
-          </h1>
-          <p className="text-gray-500 mt-2">
-            Access your restaurant dashboard
-          </p>
+          <h1 className="text-3xl font-extrabold text-gray-800">Login</h1>
+          <p className="text-gray-500 mt-2">Access your restaurant dashboard</p>
         </div>
 
         {/* FORM */}
         <form onSubmit={handleLogin} className="space-y-5">
-
           {/* EMAIL */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -79,7 +52,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-300
+              className="w-full px-4 py-3 text-black rounded-xl border border-gray-300
                          focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
@@ -94,7 +67,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-300
+              className="w-full px-4 text-black py-3 rounded-xl border border-gray-300
                          focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
@@ -118,19 +91,17 @@ export default function LoginPage() {
             {loading ? "Signing in..." : "Login"}
           </button>
         </form>
-
         {/* SIGNUP */}
-        {/* <div className="mt-6 text-center text-sm text-gray-600">
+        <div className="mt-6 text-center text-sm text-gray-600">
           Don’t have an account?{" "}
           <Link
-            href="/signup"
+            href="/register"
             className="text-emerald-600 font-semibold hover:underline"
           >
             Create one
           </Link>
-        </div> */}
-
+        </div>
       </div>
     </main>
-  )
+  );
 }

@@ -1,24 +1,36 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import auth from "../lib/firebase/firebaseAuth"
-import { onAuthStateChanged, User } from "firebase/auth"
-import Loader from "./Loader"
-
-const AuthWrapper = ({children}:React.PropsWithChildren) => {
-//   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-
+"use client";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import Loader from "./Loader";
+import { userStore } from "@/store/UserInfoStore";
+import { getUser } from "@/firebase/Users";
+const AuthWrapper = ({ children }: React.PropsWithChildren) => {
+  const [loading, setLoading] = useState(true);
+  const { loginUser, resetUser } = userStore();
+  const router = useRouter();
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (currentUser) => {
-        console.log(currentUser);
-        //   setUser(currentUser)
-      setLoading(false)
-    })
+    const unsub = onAuthStateChanged(auth, async (currentUser) => {
+      try {
+        setLoading(true);
+        if (currentUser) {
+          const info = await getUser(currentUser.uid) as any;
+          loginUser(info as any);
+        } else {
+          resetUser();
+          router.push("/");
+        }
+      } catch (error: any) {
+        console.error(error.message);
+      } finally {
+        setLoading(false);
+      }
+    });
 
-    return () => unsub()
-  }, [])
+    return () => unsub();
+  }, []);
 
-  return (loading ? <Loader/>:children)
-}
+  return loading ? <Loader /> : children;
+};
 export default AuthWrapper;

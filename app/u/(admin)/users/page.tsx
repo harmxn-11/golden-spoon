@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getAllUsers, createNewUser } from "@/lib/firebase/UsersServivce"
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([])
@@ -20,8 +19,8 @@ export default function AdminUsersPage() {
 
   const loadUsers = async () => {
     setLoading(true)
-    const data = await getAllUsers()
-    setUsers(data)
+    // const data = await getAllUsers()
+    // setUsers(data)
     setLoading(false)
   }
 
@@ -31,7 +30,7 @@ export default function AdminUsersPage() {
     setSuccess("")
 
     try {
-      await createNewUser({ email, password, role: role as any, phone })
+      // await createNewUser({ email, password, role: role as any, phone })
       setSuccess("User created successfully")
       setEmail("")
       setPassword("")

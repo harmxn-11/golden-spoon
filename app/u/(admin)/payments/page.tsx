@@ -1,11 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import {
-  getAllPaymentRequests,
-  updatePaymentStatus,
-} from "@/lib/firebase/PaymentService"
-
 export default function AdminPaymentsPage() {
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -16,8 +11,8 @@ export default function AdminPaymentsPage() {
 
   const loadRequests = async () => {
     setLoading(true)
-    const data = await getAllPaymentRequests()
-    setRequests(data)
+    // const data = await getAllPaymentRequests()
+    // setRequests(data)
     setLoading(false)
   }
 
@@ -25,7 +20,7 @@ export default function AdminPaymentsPage() {
     id: string,
     status: "approved" | "rejected"
   ) => {
-    await updatePaymentStatus(id, status)
+    // await updatePaymentStatus(id, status)
     loadRequests()
   }
 
