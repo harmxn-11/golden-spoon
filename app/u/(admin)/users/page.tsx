@@ -1,11 +1,12 @@
 "use client"
 
+import { createUser, getUsers } from "@/firebase/Users"
 import { useEffect, useState } from "react"
-
+import { userStore } from "@/store/UserInfoStore"
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-
+  const {user: userState} = userStore();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [role, setRole] = useState("user")
@@ -14,13 +15,15 @@ export default function AdminUsersPage() {
   const [success, setSuccess] = useState("")
 
   useEffect(() => {
-    loadUsers()
-  }, [])
+    if(userState){
+      loadUsers()
+    }
+  }, [userState]);
 
   const loadUsers = async () => {
     setLoading(true)
-    // const data = await getAllUsers()
-    // setUsers(data)
+    const data = await getUsers(userState!.restraunt_id);
+    setUsers(data)
     setLoading(false)
   }
 
@@ -28,9 +31,9 @@ export default function AdminUsersPage() {
     e.preventDefault()
     setError("")
     setSuccess("")
-
+    setLoading(true);
     try {
-      // await createNewUser({ email, password, role: role as any, phone })
+      await createUser({ email, password, role: role as any, phone } as any,role,"another");
       setSuccess("User created successfully")
       setEmail("")
       setPassword("")
@@ -38,6 +41,8 @@ export default function AdminUsersPage() {
       loadUsers()
     } catch (err: any) {
       setError(err.message)
+    }finally{
+      setLoading(false);
     }
   }
 
@@ -121,6 +126,7 @@ export default function AdminUsersPage() {
           {/* SUBMIT */}
           <div className="md:col-span-2">
             <button
+              disabled={loading}
               type="submit"
               className="w-full bg-emerald-600 text-white py-3 rounded-xl
                  font-semibold hover:bg-emerald-700
@@ -150,7 +156,7 @@ export default function AdminUsersPage() {
                   <th className="p-3">Email</th>
                   <th className="p-3">Role</th>
                   <th className="p-3">Phone</th>
-                  <th className="p-3">Created</th>
+                  <th className="p-3">Joined</th>
                 </tr>
               </thead>
               <tbody>
@@ -160,7 +166,7 @@ export default function AdminUsersPage() {
                     <td className="p-3 capitalize">{user.role}</td>
                     <td className="p-3">{user.phone || "-"}</td>
                     <td className="p-3 text-sm">
-                      {user.createdAt?.toDate?.().toLocaleDateString()}
+                      {(new Date(user.createdAt)).toLocaleDateString()}
                     </td>
                   </tr>
                 ))}

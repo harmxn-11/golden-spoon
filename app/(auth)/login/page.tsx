@@ -3,11 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signInUser } from "@/firebase/Users";
-
+import { getUser, signInUser } from "@/firebase/Users";
 export default function LoginPage() {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,7 +17,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await signInUser(email,password);
+      const user = (await getUser(await signInUser(email,password))) as any;
+      console.log(user.role);
+      if(user.role="CHEF"){
+          router.push("/u/orders");
+        }else if(user.role==="ADMIN"){
+          router.push("/u/orders");
+        }
+      
     } catch (err: any) {
       setError(err.message || "Login failed");
     } finally {

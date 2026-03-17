@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createUser } from "@/firebase/Users";
+import { createUser, getUser, signInUser } from "@/firebase/Users";
 import { createRestraunt } from "@/firebase/restraunts";
 import { hashPassword } from "@/handlers/bcrypt";
 import { User } from "@/types/User";
@@ -46,6 +46,12 @@ export default function RestaurantRegisterPage() {
       };
       const userId = await createUser(user as any,"ADMIN");
       await createRestraunt(restaurant as any,userId);
+      const userProfile = (await getUser(userId)) as any;
+      if(userProfile.role="ADMIN"){
+          router.push("/u");
+        }else{
+          router.push("/u/orders");
+        }
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {

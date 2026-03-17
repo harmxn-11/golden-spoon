@@ -1,23 +1,30 @@
 "use client"
-
-import { useState } from "react"
-
-type Role = "admin" | "chef"
+import { getRestraunt } from "@/firebase/restraunts";
+import { getUser } from "@/firebase/Users";
+import { userStore } from "@/store/UserInfoStore";
+import { useEffect, useState } from "react"
 
 export default function ProfilePage() {
-  // 🔁 Later replace with real user data
-  const [role] = useState<Role>("admin")
+  const [editProfile,setEditProfile] = useState(true);
+  const {user} = userStore();
+  const role = user?.role || "CHEF";
+  const [profile, setProfile] = useState<any>({
+    
+  });
 
-  const profile = {
-    name: role === "admin" ? "Restaurant Admin" : "Head Chef",
-    email: role === "admin" ? "admin@restaurant.com" : "chef@restaurant.com",
-    phone: "+91 98765 43210",
-    role: role === "admin" ? "Administrator" : "Kitchen Staff",
-    restaurant: "QR Menu Restaurant",
-    joined: "12 Jan 2025",
-    shift: role === "chef" ? "10:00 AM – 10:00 PM" : null
-  }
-
+  const [restaurant, setRestaurant] = useState<any>({
+  });
+  useEffect(()=>{
+    const fetchData = async () => {
+      const userProfile = await getUser(user!.id);
+      const userRestraunt = await getRestraunt(user!.restraunt_id);
+      setProfile(userProfile as any);
+      setRestaurant(userRestraunt as any);
+    };
+    if(user){
+      fetchData();     
+    }
+  },[user]);
   return (
     <main className="min-h-screen px-6 py-16">
       <div className="mx-auto">
@@ -26,7 +33,7 @@ export default function ProfilePage() {
         <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 mb-8">
           <div className="flex items-center gap-6">
             <div className="w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center text-white text-3xl font-bold">
-              {profile.name.charAt(0)}
+              {profile?.name?.charAt(0)}
             </div>
 
             <div>
@@ -47,27 +54,27 @@ export default function ProfilePage() {
 
           <div className="grid sm:grid-cols-2 gap-6">
 
-            <ProfileItem label="Full Name" value={profile.name} />
-            <ProfileItem label="Email Address" value={profile.email} />
-            <ProfileItem label="Phone Number" value={profile.phone} />
-            <ProfileItem label="Role" value={profile.role} />
-            <ProfileItem label="Restaurant" value={profile.restaurant} />
-            <ProfileItem label="Joined On" value={profile.joined} />
+            <ProfileItem disabled={editProfile} label="Full Name" value={profile.name} />
+            <ProfileItem disabled={editProfile} label="Email Address" value={profile.email} />
+            <ProfileItem disabled={editProfile} label="Phone Number" value={profile.phone} />
+            <ProfileItem disabled={editProfile} label="Role" value={profile.role} />
+            <ProfileItem disabled={editProfile} label="Restaurant" value={restaurant.name} />
+            {/* <ProfileItem disabled={editProfile} label="Joined On" value={profile.joined} /> */}
 
-            {profile.shift && (
+            {/* {profile.shift && (
               <ProfileItem label="Working Shift" value={profile.shift} />
-            )}
+            )} */}
           </div>
 
           {/* ACTIONS */}
           <div className="mt-10 flex flex-wrap gap-4">
-            <button className="px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
-              Edit Profile
-            </button>
+            {/* <button className="px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+              {editProfile ? "Save Profile":"Edit Profile"}
+            </button> */}
 
-            <button className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+            {/* <button className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
               Change Password
-            </button>
+            </button> */}
           </div>
 
         </div>
@@ -79,15 +86,17 @@ export default function ProfilePage() {
 /* ---------- COMPONENT ---------- */
 function ProfileItem({
   label,
-  value
+  value,
+  disabled = false
 }: {
   label: string
   value: string
+  disabled: boolean
 }) {
   return (
     <div>
       <p className="text-sm text-gray-500 mb-1">{label}</p>
-      <p className="font-semibold text-gray-800">{value}</p>
+      <input defaultValue={value} disabled={disabled} className="font-semibold text-gray-800" />
     </div>
   )
 }

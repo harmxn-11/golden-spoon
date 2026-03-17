@@ -6,6 +6,7 @@ interface User {
   email: string;
   role: string;
   phone: string;
+  restraunt_id: string;
 }
 interface UserStoreStructure {
   user: null | User;

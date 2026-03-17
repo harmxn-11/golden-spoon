@@ -2,14 +2,6 @@
 
 import { useState } from "react"
 import { useEffect } from "react"
-import {
-  getMenuSections,
-  createSection,
-  deleteSectionById,
-  addItemToSection,
-  toggleItemAvailability,
-  deleteItemFromSection,
-} from "@/lib/firebase/MenuService"
 
 interface MenuItem {
   id: string

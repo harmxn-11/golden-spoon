@@ -13,15 +13,15 @@ export default function Sidebar() {
   const {user} = userStore();
   const links = [
     { name: "Dashboard", href: "/u", icon: LayoutDashboard,role: ["ADMIN"] },
-    { name: "Menu", href: "/u/menu", icon: MenuIcon,role: ["ADMIN","CHEF","WAITER"] },
+    { name: "Orders", href: "/u/orders", icon: ClipboardList,role: ["ADMIN","CHEF"] },
+    { name: "Menu", href: "/u/menu", icon: MenuIcon,role: ["ADMIN","CHEF"] },
     { name: "Withdrawal Requests", href: "/u/payments", icon: Banknote,role: ["ADMIN"] },
     { name: "Users", href: "/u/users", icon: Users,role: ["ADMIN"] },
-    { name: "Orders", href: "/u/orders", icon: ClipboardList,role: ["ADMIN","CHEF","WAITER"] },
-    { name: "Balance", href: "/u/balance", icon: Scale, role: ["CHEF","WAITER"] },
-    { name: "history", href: "/u/history", icon: History, role: ["CHEF","WAITER"] },
-    { name: "Profile", href: "/u/profile", icon: User, role:["ADMIN","CHEF","WAITER"] },
+    { name: "Balance", href: "/u/balance", icon: Scale, role: ["CHEF"] },
+    { name: "history", href: "/u/history", icon: History, role: ["CHEF"] },
+    { name: "Profile", href: "/u/profile", icon: User, role:["ADMIN","CHEF"] },
   ]?.filter(({role})=>{
-    return role.includes(user!.role);
+    return role.includes(user?.role || "USER");
   });
   const pathName = usePathname();
   const router = useRouter();
@@ -82,7 +82,7 @@ export default function Sidebar() {
           })}
         </nav>
         </div>
-        <Button variant={"destructive"} onClick={async ()=>{await logOutUser();router.push("/")}} className="w-full text-lg py-5!"><LogOut /> Logout</Button>
+        <Button variant={"destructive"} onClick={async ()=>{await logOutUser();router.push("/");}} className="w-full text-lg py-5!"><LogOut /> Logout</Button>
       </aside>
     </>
   )
