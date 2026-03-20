@@ -3,7 +3,7 @@
 import { getUser } from "@/firebase/Users"
 import { useEffect, useState } from "react"
 import { userStore } from "@/store/UserInfoStore"
-import { getPaymentInfo, savePaymentInfo } from "@/firebase/PaymentInfo"
+import { getPaymentInfo, savePaymentInfo } from "@/firebase/paymentInfo"
 import { PaymentInfo } from "@/types/PaymentInfo"
 export default function BankBalancePage() {
   const [balance, setBalance] = useState(0)

@@ -1,8 +1,9 @@
 "use client"
 
+import { createMenuItem, createMenuSection, deleteMenuItem, deleteMenuSection, getMenu, toggleMenuItemStatus } from "@/firebase/Menus"
 import { useState } from "react"
 import { useEffect } from "react"
-
+import { userStore } from "@/store/UserInfoStore"
 interface MenuItem {
   id: string
   name: string
@@ -17,38 +18,37 @@ interface MenuSection {
 }
 
 export default function AdminMenuPage() {
-  const [sections, setSections] = useState<MenuSection[]>([
-    {
-      id: "sec1",
-      title: "Starters",
-      items: [
-        { id: "i1", name: "Paneer Tikka", price: 240, available: true },
-        { id: "i2", name: "Veg Manchurian", price: 180, available: true },
-      ],
-    },
-  ])
-
+  const [sections, setSections] = useState<MenuSection[]>([]);
   const [newSection, setNewSection] = useState("")
   const [newItem, setNewItem] = useState({ name: "", price: "" })
-
+  const {user} = userStore();
+  const ROLE = user?.role || "CHEF";
   // SECTION CRUD
-  const addSection = () => {
-    if (!newSection.trim()) return
+  const addSection = async () => {
+    if (!newSection.trim()) return;
+    const newSectionID = await createMenuSection(newSection);
     setSections([
       ...sections,
-      { id: Date.now().toString(), title: newSection, items: [] },
+      { id: newSectionID as string, title: newSection, items: [] },
     ])
     setNewSection("")
   }
 
-  const deleteSection = (id: string) => {
+  const deleteSection = async (id: string) => {
+    await deleteMenuSection(id);
     setSections(sections.filter((s) => s.id !== id))
   }
-
+  useEffect(()=>{
+    const fetchData = async () => {
+      const data = await getMenu();
+      setSections(data as MenuSection[]);
+    };
+    fetchData();
+  },[]);
   // ITEM CRUD
-  const addItem = (sectionId: string) => {
+  const addItem = async (sectionId: string) => {
     if (!newItem.name || !newItem.price) return
-
+    const createdMenuItemId = await createMenuItem(newItem.name,parseInt(newItem.price),sectionId);
     setSections((prev) =>
       prev.map((sec) =>
         sec.id === sectionId
@@ -57,7 +57,7 @@ export default function AdminMenuPage() {
               items: [
                 ...sec.items,
                 {
-                  id: Date.now().toString(),
+                  id: createdMenuItemId,
                   name: newItem.name,
                   price: Number(newItem.price),
                   available: true,
@@ -71,7 +71,8 @@ export default function AdminMenuPage() {
     setNewItem({ name: "", price: "" })
   }
 
-  const toggleAvailability = (sectionId: string, itemId: string) => {
+  const toggleAvailability = async (sectionId: string, itemId: string) => {
+    await toggleMenuItemStatus(itemId,sectionId);
     setSections((prev) =>
       prev.map((sec) =>
         sec.id === sectionId
@@ -88,7 +89,8 @@ export default function AdminMenuPage() {
     )
   }
 
-  const deleteItem = (sectionId: string, itemId: string) => {
+  const deleteItem = async (sectionId: string, itemId: string) => {
+    await deleteMenuItem(itemId,sectionId);
     setSections((prev) =>
       prev.map((sec) =>
         sec.id === sectionId
@@ -114,6 +116,7 @@ export default function AdminMenuPage() {
         </div>
 
         {/* ADD SECTION */}
+        { ROLE==="ADMIN" &&
         <div className="bg-white/10 backdrop-blur rounded-3xl p-6 mb-10 border border-white/10 flex gap-4">
           <input
             value={newSection}
@@ -128,7 +131,7 @@ export default function AdminMenuPage() {
             Add Section
           </button>
         </div>
-
+        }
         {/* SECTIONS */}
         <div className="space-y-10">
           {sections.map((section) => (
@@ -139,12 +142,12 @@ export default function AdminMenuPage() {
               {/* SECTION HEADER */}
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">{section.title}</h2>
-                <button
+                {ROLE==="ADMIN" && <button
                   onClick={() => deleteSection(section.id)}
                   className="text-red-400 hover:text-red-500"
                 >
                   Delete Section
-                </button>
+                </button>}
               </div>
 
               {/* ITEMS */}
@@ -175,20 +178,22 @@ export default function AdminMenuPage() {
                         {item.available ? "Available" : "Disabled"}
                       </button>
 
-                      <button
+                      {ROLE==="ADMIN" && <button
                         onClick={() =>
                           deleteItem(section.id, item.id)
                         }
                         className="text-red-400 hover:text-red-500"
                       >
                         Remove
-                      </button>
+                      </button>}
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* ADD ITEM */}
+              {
+                ROLE==="ADMIN" && 
               <div className="flex gap-4 mt-6">
                 <input
                   placeholder="Item name"
@@ -216,6 +221,7 @@ export default function AdminMenuPage() {
                   Add
                 </button>
               </div>
+              }
             </div>
           ))}
         </div>

@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
-
+import { getMenuById } from "@/firebase/Menus"
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
 interface MenuItem {
   id: string
   name: string
@@ -21,26 +22,35 @@ interface CartItem extends MenuItem {
 export default function CustomerMenuPage() {
   const [orderType, setOrderType] = useState<"dine-in" | "takeaway">("dine-in")
   const [paymentMode, setPaymentMode] = useState<"cash" | "upi">("upi")
-
-  const menu: MenuSection[] = [
-    {
-      id: "s1",
-      title: "Starters",
-      items: [
-        { id: "i1", name: "Paneer Tikka", price: 240 },
-        { id: "i2", name: "Veg Manchurian", price: 180 },
-      ],
-    },
-    {
-      id: "s2",
-      title: "Main Course",
-      items: [
-        { id: "i3", name: "Paneer Butter Masala", price: 260 },
-        { id: "i4", name: "Dal Makhani", price: 220 },
-      ],
-    },
-  ]
-
+  const [menu,setMenu] = useState<MenuSection[]>([]);
+  const {restrauntId,tableId} = useParams();
+  // const menu: MenuSection[] = [
+  //   {
+  //     id: "s1",
+  //     title: "Starters",
+  //     items: [
+  //       { id: "i1", name: "Paneer Tikka", price: 240 },
+  //       { id: "i2", name: "Veg Manchurian", price: 180 },
+  //     ],
+  //   },
+  //   {
+  //     id: "s2",
+  //     title: "Main Course",
+  //     items: [
+  //       { id: "i3", name: "Paneer Butter Masala", price: 260 },
+  //       { id: "i4", name: "Dal Makhani", price: 220 },
+  //     ],
+  //   },
+  // ]
+  useEffect(()=>{
+    const fetchData = async () => {
+      const data = await getMenuById(restrauntId as string);
+      setMenu(data as MenuSection[]);
+    };
+    if(restrauntId){
+      fetchData();
+    }
+  },[restrauntId,tableId]);
   const [cart, setCart] = useState<CartItem[]>([])
 
   const addToCart = (item: MenuItem) => {
@@ -75,7 +85,7 @@ export default function CustomerMenuPage() {
       alert("Please add items to cart")
       return
     }
-
+    
     alert(
       `Order Confirmed\nOrder Type: ${orderType}\nPayment: ${paymentMode.toUpperCase()}\nTotal: ₹${totalAmount}`
     )
@@ -225,7 +235,7 @@ export default function CustomerMenuPage() {
               <img
                 src="/upi-qr.png"
                 alt="UPI QR"
-                className="mx-auto w-36 h-36 rounded-xl border border-white/20"
+                className="mx-auto w-30 h-30 rounded-xl border border-white/20"
               />
             </div>
           )}
