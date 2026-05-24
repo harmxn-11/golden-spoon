@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthWrapper from "@/components/AuthWrapper";
-import {ThemeProvider} from "next-themes";
+import { ThemeProvider } from "next-themes";
+import { Toaster } from "react-hot-toast";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,9 +30,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthWrapper>
-        <ThemeProvider defaultTheme="dark" enableSystem disableTransitionOnChange attribute={"class"}>
-        {children}
-        </ThemeProvider>
+          <ThemeProvider defaultTheme="dark" enableSystem disableTransitionOnChange attribute={"class"}>
+            <Toaster />
+            {children}
+          </ThemeProvider>
         </AuthWrapper>
       </body>
     </html>

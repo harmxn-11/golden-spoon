@@ -1,7 +1,47 @@
 "use client"
 import Link from "next/link"
-
+import { useState } from "react";
+import toast from "react-hot-toast";
 export default function HomePage() {
+  const [loading, setLoading] = useState(false);
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        toast.error(data.message);
+        return;
+      }
+
+      toast.success("Message sent!");
+
+      setForm({ name: "", email: "", message: "" });
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white">
 
@@ -128,41 +168,54 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CONTACT FORM */}
       <section className="py-24">
         <div className="max-w-4xl mx-auto px-6">
           <div className="bg-white/10 backdrop-blur rounded-3xl shadow-2xl p-5 md:p-10 border border-white/10">
             <h2 className="text-3xl font-bold text-center mb-4">
               Contact Us
             </h2>
+
             <p className="text-center text-gray-300 mb-10">
               Have questions or want to onboard your restaurant?
             </p>
 
-            <form className="grid gap-6">
+            <form onSubmit={handleSubmit} className="grid gap-6">
               <input
                 type="text"
                 placeholder="Your Name"
-                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20 focus:border-emerald-500 outline-none"
+                value={form.name}
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20"
               />
 
               <input
                 type="email"
                 placeholder="Your Email"
-                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20 focus:border-emerald-500 outline-none"
+                value={form.email}
+                onChange={(e) =>
+                  setForm({ ...form, email: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20"
               />
 
               <textarea
                 rows={4}
                 placeholder="Your Message"
-                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20 focus:border-emerald-500 outline-none"
+                value={form.message}
+                onChange={(e) =>
+                  setForm({ ...form, message: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20"
               />
 
               <button
                 type="submit"
-                className="bg-emerald-600 py-4 rounded-xl font-semibold hover:bg-emerald-600 transition"
+                disabled={loading}
+                className="bg-emerald-600 py-4 rounded-xl font-semibold hover:bg-emerald-700 transition"
               >
-                Send Message
+                {loading ? "Sending..." : "Send Message"}
               </button>
             </form>
           </div>
