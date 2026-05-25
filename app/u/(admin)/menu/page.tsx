@@ -165,18 +165,6 @@ export default function AdminMenuPage() {
                     </div>
 
                     <div className="flex gap-3 items-center">
-                      <button
-                        onClick={() =>
-                          toggleAvailability(section.id, item.id)
-                        }
-                        className={`px-4 py-1 rounded-full text-xs font-semibold ${
-                          item.available
-                            ? "bg-emerald-500/20 text-emerald-400"
-                            : "bg-red-500/20 text-red-400"
-                        }`}
-                      >
-                        {item.available ? "Available" : "Disabled"}
-                      </button>
 
                       {ROLE==="ADMIN" && <button
                         onClick={() =>

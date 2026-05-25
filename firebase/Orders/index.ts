@@ -98,6 +98,7 @@ export async function getOrdersForTable(tableId: string, restrauntId: string) {
     const orders = await getDocs(collectionRef);
     return orders.docs
       .map((order) => {
+        console.log({ id: order.id, ...order.data() });
         return { id: order.id, ...order.data() };
       })
       .filter((order: any) => {
